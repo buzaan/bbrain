@@ -14,7 +14,7 @@ Brain.begin = function() {
     var brain = new Brain();
     brain.init();
     brain.step();
-    window.setInterval(brain.step, 1000);
+    window.setInterval(function() { brain.step() }, 1000);
 }
 
 Brain.prototype.init = function() {
@@ -29,7 +29,9 @@ Brain.prototype.init = function() {
 	
 	var x;
 	for(x = 0; x < this.x_cells * this.y_cells; x++) {
-	    this.cells[x] = this.state.dead;
+	    var state = Math.random() > 0.5 ? this.state.dead 
+		                            : this.state.alive;
+	    this.cells[x] = state;
 	}
 	//Clone array;
 	this.work = this.cells.slice();
@@ -56,13 +58,13 @@ Brain.prototype.updateCell = function(x, y) {
     var alive = n.reduce(function(c) { c == that.state.alive; });
     var state = undefined;
     
-    if(cell.state == this.state.alive) {
+    if(cell == this.state.alive) {
 	state = this.state.dying;
     }
-    else if(cell.state == this.state.dying) {
+    else if(cell == this.state.dying) {
 	state = this.state.dead;
     }
-    else if(alive == 2) {
+    else if(alive == 2 /* cell == dead implied */) {
 	state = this.state.alive;
     }
     this.work[this.cellIndex(x, y)] = state;    
@@ -90,6 +92,7 @@ Brain.prototype.mooreNeighborhood = function(x, y) {
 }
 
 Brain.prototype.render = function() {
+    this.context.fillStyle = this.colors.dead;
     this.context.fillRect(0, 0,
 			  this.x_cells, this.y_cells,
 			  this.colors.dead);
@@ -97,10 +100,12 @@ Brain.prototype.render = function() {
 	for(var y = 0; y < this.y_cells; y++) {
 	    var state = this.cellAt(x, y);
 	    if(state == this.state.alive) {
-		this.context.fillRect(x, y, 1, 1, this.colors.alive);
+		this.context.fillStyle = this.colors.alive;
+		this.context.fillRect(x, y, 1, 1);
 	    }
 	    else if(state == this.state.dying) {
-		this.context.fillRect(x, y, 1, 1, this.colors.dying);
+		this.context.fillStyle = this.colors.dying;
+		this.context.fillRect(x, y, 1, 1);
 	    }
 	    else {
 		// Background fill color is the dead color, so do nothing
@@ -110,9 +115,9 @@ Brain.prototype.render = function() {
 }    
 
 Brain.prototype.step = function() {
+	this.render();
 	this.update();
 	this.swap();
-	this.render();
 }
 
 document.addEventListener("DOMContentLoaded", Brain.begin, true);

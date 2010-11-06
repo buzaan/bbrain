@@ -11,6 +11,7 @@ function Brain(x_cells, y_cells) {
 	var state = Math.random() > 0.5 ? this.state.dead : this.state.alive;
 	this.cells[x] = state;
     }
+
     //Clone array;
     this.work = this.cells.slice();
 
@@ -21,9 +22,24 @@ Brain.prototype.colors = {dead: 'black', dying: 'grey', alive: 'white'};
 Brain.prototype.state = {dead: 0, dying: 1, alive: 2};
 
 Brain.begin = function() { 
+    var running = true;
     var brain = new Brain(50, 50);
-    brain.step();
-    window.setInterval(function() { brain.step() }, 0);
+    var handle = window.setInterval(function() {brain.step(); }, 0);
+    var btn = document.getElementById("stop/start");
+
+    btn.addEventListener("click", function(e) {
+	running = !running;
+	if(running) {
+	    handle = window.setInterval(function() {brain.step(); }, 0);
+	}
+	else {
+	    window.clearInterval(handle);
+	}
+    });
+}
+
+Brain.prototype.togglePause = function() {
+    this.running = !this.running;
 }
 
 Brain.prototype.swap = function() {
@@ -113,9 +129,9 @@ Brain.prototype.render = function() {
 }    
 
 Brain.prototype.step = function() {
-	this.render();
-	this.update();
-	this.swap();
+    this.render();
+    this.update();
+    this.swap();
 }
 
 document.addEventListener("DOMContentLoaded", Brain.begin, true);

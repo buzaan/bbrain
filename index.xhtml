@@ -1,21 +1,23 @@
 <?xml version="1.0"?>
-<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title>Brian's Brain</title>
-    <script src="brain.js" />
+    <script src="brain.js" type="text/javascript"/>
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <h1>Welcome to Bryan's Brain</h1>
-
-    <div class="content">
-      <canvas id="brain" width="500" height="500" />
-    </div>
+    <h1>Bryan's Brain</h1>
+    <p>What the heck is <a href="http://www.wikipedia.org/wiki/Brian's_Brain">Brian's Brain</a>?</p>
 
     <div class="controls">
-      <button id="stop/start" type="button">Start/Stop</button>
+      <button id="pause" type="button">Start/Stop</button>
+
+      <p>Use a <input id="xdim" type="number"/> by <input id="ydim" type="number"/> grid, and update at a rate of <input id="interval" type="number"/>ms. <button id="restart">Restart</button></p>
+    </div>
+
+    <div class="content">
+      <canvas id="brain" width="500" height="500"/>
     </div>
   </body>
 </html>

@@ -1,6 +1,66 @@
+function Simulation(x, y) {
+    this.brain = new Brain(x, y);
+    this.interval = 0;
+    this.handle = null;
+    this.running = true;
+    this.context = document.getElementById("brain").getContext("2d");
+
+    document.getElementById("xdim").value = this.brain.x_cells;
+    document.getElementById("ydim").value = this.brain.y_cells;
+    document.getElementById("interval").value = this.interval;
+    var restart = document.getElementById("restart");
+    var self = this;
+    restart.addEventListener("click", function(e) {
+	var x = document.getElementById("xdim").valueAsNumber;
+	var y = document.getElementById("ydim").valueAsNumber;
+	self.interval = document.getElementById("interval").valueAsNumber;
+	self.reset(x, y);
+    }, false);
+
+    var btn = document.getElementById("pause");
+    btn.addEventListener("click", function(e) {
+	self.toggleRun();
+    }, false);
+}
+
+Simulation.prototype.step = function() {
+    this.brain.step(this.context);
+}
+
+Simulation.prototype.run = function() {
+    var self = this;
+    var fn = function(e) { self.step(); };
+    this.handle = window.setInterval(fn, this.interval);
+    this.running = true;
+}
+
+Simulation.prototype.pause = function() {
+    window.clearInterval(this.handle);
+    this.running = false;
+}
+
+Simulation.prototype.toggleRun = function() {
+    if(this.running) {
+	this.pause();
+    }
+    else {
+	this.run();
+    }
+}
+
+Simulation.prototype.reset = function(x, y) {
+    this.pause();
+    this.brain = new Brain(x, y);
+    this.run();
+}
+
+Simulation.begin = function() { 
+    var sim = new Simulation(50, 50);
+    sim.run();
+}
+
 function Brain(x_cells, y_cells) {
     this.canvas = document.getElementById('brain');
-    this.context = this.canvas.getContext('2d')
     this.x_cells = x_cells;
     this.y_cells = y_cells;
     this.scale = {x: this.canvas.width / this.x_cells,
@@ -20,23 +80,6 @@ function Brain(x_cells, y_cells) {
 
 Brain.prototype.colors = {dead: 'black', dying: 'grey', alive: 'white'};
 Brain.prototype.state = {dead: 0, dying: 1, alive: 2};
-
-Brain.begin = function() { 
-    var running = true;
-    var brain = new Brain(50, 50);
-    var handle = window.setInterval(function() {brain.step(); }, 0);
-    var btn = document.getElementById("stop/start");
-
-    btn.addEventListener("click", function(e) {
-	running = !running;
-	if(running) {
-	    handle = window.setInterval(function() {brain.step(); }, 0);
-	}
-	else {
-	    window.clearInterval(handle);
-	}
-    });
-}
 
 Brain.prototype.togglePause = function() {
     this.running = !this.running;
@@ -102,36 +145,34 @@ Brain.prototype.mooreNeighborhood = function(x, y) {
 	    this.cellAt(x + 1, y + 1)];
 }
 
-Brain.prototype.render = function() {
-    this.context.save();
-    this.context.scale(this.scale.x, this.scale.y);
-    this.context.fillStyle = this.colors.dead;
-    this.context.fillRect(0, 0,
-			  this.x_cells, this.y_cells,
-			  this.colors.dead);
+Brain.prototype.render = function(context) {
+    context.save();
+    context.scale(this.scale.x, this.scale.y);
+    context.fillStyle = this.colors.dead;
+    context.fillRect(0, 0, this.x_cells, this.y_cells, this.colors.dead);
     for(var x = 0; x < this.x_cells; x++) {
 	for(var y = 0; y < this.y_cells; y++) {
 	    var state = this.cellAt(x, y);
 	    if(state == this.state.alive) {
-		this.context.fillStyle = this.colors.alive;
-		this.context.fillRect(x, y, 1, 1);
+		context.fillStyle = this.colors.alive;
+		context.fillRect(x, y, 1, 1);
 	    }
 	    else if(state == this.state.dying) {
-		this.context.fillStyle = this.colors.dying;
-		this.context.fillRect(x, y, 1, 1);
+		context.fillStyle = this.colors.dying;
+		context.fillRect(x, y, 1, 1);
 	    }
 	    else {
 		// Background fill color is the dead color, so do nothing
 	    }
 	}
     }
-    this.context.restore();
+    context.restore();
 }    
 
-Brain.prototype.step = function() {
-    this.render();
+Brain.prototype.step = function(context) {
+    this.render(context);
     this.update();
     this.swap();
 }
 
-document.addEventListener("DOMContentLoaded", Brain.begin, true);
+document.addEventListener("DOMContentLoaded", Simulation.begin, true);

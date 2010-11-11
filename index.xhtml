@@ -1,23 +1,28 @@
 <?xml version="1.0"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta name="description" content="A brian's brain implementation using canvas" />
     <title>Brian's Brain</title>
     <script src="brain.js" type="text/javascript"/>
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <h1>Bryan's Brain</h1>
-    <p>What the heck is <a href="http://www.wikipedia.org/wiki/Brian's_Brain">Brian's Brain</a>?</p>
+    <article>
+      <section>
+	<h1>Bryan's Brain</h1>
+	<p>What the heck is <a href="http://www.wikipedia.org/wiki/Brian's_Brain">Brian's Brain</a>?</p>
+      </section>
 
-    <div class="controls">
-      <button id="pause" type="button">Start/Stop</button>
-
-      <p>Use a <input id="xdim" type="number"/> by <input id="ydim" type="number"/> grid, and update at a rate of <input id="interval" type="number"/>ms. <button id="restart">Restart</button></p>
-    </div>
-
-    <div class="content">
-      <canvas id="brain" width="500" height="500"/>
-    </div>
+      <section class="controls">
+	<button id="pause" type="button">Start/Stop</button>
+	
+	<p>Use a <input id="xdim" type="number"/> by <input id="ydim" type="number"/> grid and update at a rate of <input id="interval" type="number"/>ms. <button id="restart">Restart</button></p>
+      </section>
+      
+      <section class="content">
+	<canvas id="brain" width="500" height="500"/>
+      </section>
+    </article>
   </body>
 </html>

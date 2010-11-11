@@ -1,6 +1,6 @@
 function Simulation(x, y) {
     this.brain = new Brain(x, y);
-    this.interval = 0;
+    this.interval = 10;
     this.handle = null;
     this.running = true;
     this.context = document.getElementById("brain").getContext("2d");
@@ -21,6 +21,21 @@ function Simulation(x, y) {
     btn.addEventListener("click", function(e) {
 	self.toggleRun();
     }, false);
+
+    var brain = document.getElementById("brain");
+    brain.addEventListener("click", function(e) {
+	var bound = brain.getBoundingClientRect();
+	var x = e.clientX - bound.left;
+	var y = e.clientY - bound.top;
+	var pt = self.userPointToCell(x, y);
+	self.brain.setCell(pt.x, pt.y, Brain.state.alive);
+	self.brain.render(self.context);
+    }, false);
+}
+
+Simulation.prototype.userPointToCell = function(x_loc, y_loc) {
+    return {x: Math.floor(x_loc / this.brain.cellWidth()),
+	    y: Math.floor(y_loc / this.brain.cellHeight())};
 }
 
 Simulation.prototype.step = function() {
@@ -68,7 +83,7 @@ function Brain(x_cells, y_cells) {
     
     this.cells = [];
     for(var x = 0; x < this.x_cells * this.y_cells; x++) {
-	var state = Math.random() > 0.5 ? this.state.dead : this.state.alive;
+	var state = Math.random() > 0.5 ? Brain.state.dead : Brain.state.alive;
 	this.cells[x] = state;
     }
 
@@ -78,8 +93,20 @@ function Brain(x_cells, y_cells) {
     this.ind = [];
 }
 
-Brain.prototype.colors = {dead: 'black', dying: 'grey', alive: 'white'};
-Brain.prototype.state = {dead: 0, dying: 1, alive: 2};
+Brain.colors = {dead: 'black', dying: 'grey', alive: 'white'};
+Brain.state = {dead: 0, dying: 1, alive: 2};
+
+Brain.prototype.cellWidth = function() {
+    return this.canvas.width / this.x_cells;
+}
+
+Brain.prototype.cellHeight = function() {
+    return this.canvas.height / this.y_cells;
+}
+
+Brain.prototype.setCell = function(x, y, state) {
+    this.cells[this.cellIndex(x,y)] = state;
+}
 
 Brain.prototype.togglePause = function() {
     this.running = !this.running;
@@ -105,18 +132,18 @@ Brain.prototype.updateCell = function(x, y) {
     var that = this;
     var alive = n.reduce(
 	function(prev, cur, index, array) {
-	    return prev + (cur == that.state.alive ? 1 : 0);
+	    return prev + (cur == Brain.state.alive ? 1 : 0);
 	}, 0);
     var state = undefined;
     
-    if(cell == this.state.alive) {
-	state = this.state.dying;
+    if(cell == Brain.state.alive) {
+	state = Brain.state.dying;
     }
-    else if(cell == this.state.dying) {
-	state = this.state.dead;
+    else if(cell == Brain.state.dying) {
+	state = Brain.state.dead;
     }
     else if(alive == 2 /* cell == dead implied */) {
-	state = this.state.alive;
+	state = Brain.state.alive;
     } else {
 	state = cell;
     }
@@ -148,17 +175,17 @@ Brain.prototype.mooreNeighborhood = function(x, y) {
 Brain.prototype.render = function(context) {
     context.save();
     context.scale(this.scale.x, this.scale.y);
-    context.fillStyle = this.colors.dead;
-    context.fillRect(0, 0, this.x_cells, this.y_cells, this.colors.dead);
+    context.fillStyle = Brain.colors.dead;
+    context.fillRect(0, 0, this.x_cells, this.y_cells, Brain.colors.dead);
     for(var x = 0; x < this.x_cells; x++) {
 	for(var y = 0; y < this.y_cells; y++) {
 	    var state = this.cellAt(x, y);
-	    if(state == this.state.alive) {
-		context.fillStyle = this.colors.alive;
+	    if(state == Brain.state.alive) {
+		context.fillStyle = Brain.colors.alive;
 		context.fillRect(x, y, 1, 1);
 	    }
-	    else if(state == this.state.dying) {
-		context.fillStyle = this.colors.dying;
+	    else if(state == Brain.state.dying) {
+		context.fillStyle = Brain.colors.dying;
 		context.fillRect(x, y, 1, 1);
 	    }
 	    else {

@@ -24,35 +24,66 @@ function Simulation(x, y) {
 
     var brain = document.getElementById("brain");
     brain.addEventListener("click", function(e) {
-	var bound = brain.getBoundingClientRect();
-	var x = e.clientX - bound.left;
-	var y = e.clientY - bound.top;
-	var pt = self.userPointToCell(x, y);
+	var pt = self.userPointToCell(e.clientX, e.clientY);
 	self.brain.setCell(pt.x, pt.y, Brain.state.alive);
 	self.brain.render(self.context);
     }, false);
-}
+
+    brain.addEventListener("mousemove", function(e) {
+	var pt = self.userPointToCell(e.clientX, e.clientY);
+	self.cursor = pt;
+	self.render();
+    }, false);
+
+    brain.addEventListener("mouseout", function(e) {
+	self.cursor = null;
+    }, false);
+};
 
 Simulation.prototype.userPointToCell = function(x_loc, y_loc) {
-    return {x: Math.floor(x_loc / this.brain.cellWidth()),
-	    y: Math.floor(y_loc / this.brain.cellHeight())};
-}
+    var brain = document.getElementById("brain");
+    var bound = brain.getBoundingClientRect();
+    var cx = x_loc - bound.left;
+    var cy = y_loc - bound.top;    
+    return {x: Math.floor(cx / this.brain.cellWidth()),
+	    y: Math.floor(cy / this.brain.cellHeight())};
+};
+
+Simulation.prototype.render = function() {
+    this.brain.render(this.context);
+
+    if(this.cursor) {
+	var w = this.brain.cellWidth();
+	var h = this.brain.cellHeight();
+	var sx = this.brain.scale.x;
+	var sy = this.brain.scale.y;
+	this.context.strokeStyle = "yellow";
+	this.context.strokeRect(this.cursor.x * sx,
+				this.cursor.y * sy,
+				w, h);
+    }
+
+};
 
 Simulation.prototype.step = function() {
-    this.brain.step(this.context);
-}
+    this.brain.step();
+    this.render();
+};
 
 Simulation.prototype.run = function() {
     var self = this;
     var fn = function(e) { self.step(); };
     this.handle = window.setInterval(fn, this.interval);
     this.running = true;
-}
+};
 
 Simulation.prototype.pause = function() {
     window.clearInterval(this.handle);
+    if(this.running) {
+	this.render();
+    }
     this.running = false;
-}
+};
 
 Simulation.prototype.toggleRun = function() {
     if(this.running) {
@@ -61,18 +92,18 @@ Simulation.prototype.toggleRun = function() {
     else {
 	this.run();
     }
-}
+};
 
 Simulation.prototype.reset = function(x, y) {
     this.pause();
     this.brain = new Brain(x, y);
     this.run();
-}
+};
 
 Simulation.begin = function() { 
     var sim = new Simulation(50, 50);
     sim.run();
-}
+};
 
 function Brain(x_cells, y_cells) {
     this.canvas = document.getElementById('brain');
@@ -91,22 +122,22 @@ function Brain(x_cells, y_cells) {
     this.work = this.cells.slice();
 
     this.ind = [];
-}
+};
 
 Brain.colors = {dead: 'black', dying: 'grey', alive: 'white'};
 Brain.state = {dead: 0, dying: 1, alive: 2};
 
 Brain.prototype.cellWidth = function() {
     return this.canvas.width / this.x_cells;
-}
+};
 
 Brain.prototype.cellHeight = function() {
     return this.canvas.height / this.y_cells;
-}
+};
 
 Brain.prototype.setCell = function(x, y, state) {
     this.cells[this.cellIndex(x,y)] = state;
-}
+};
 
 Brain.prototype.togglePause = function() {
     this.running = !this.running;
@@ -116,7 +147,7 @@ Brain.prototype.swap = function() {
     var temp = this.cells;
     this.cells = this.work;
     this.work = temp;
-}
+};
 
 Brain.prototype.update = function() {
     for(var x = 0; x < this.x_cells; x++) {
@@ -124,7 +155,7 @@ Brain.prototype.update = function() {
 	    this.updateCell(x, y);
 	}
     }
-}
+};
 
 Brain.prototype.updateCell = function(x, y) {
     var cell = this.cellAt(x, y);
@@ -148,16 +179,16 @@ Brain.prototype.updateCell = function(x, y) {
 	state = cell;
     }
     this.work[this.cellIndex(x, y)] = state;    
-}
+};
 
 Brain.prototype.cellAt = function(x, y) {
     return this.cells[this.cellIndex(x, y)];
-}
+};
 
 Brain.prototype.cellIndex =  function(x, y) {
     var mod = function(x, m) { return (((x % m) + m) % m); }
     return mod(y, this.y_cells) * this.x_cells + mod(x, this.x_cells);
-}
+};
 
 Brain.prototype.mooreNeighborhood = function(x, y) {
     return [this.cellAt(x - 1, y - 1),
@@ -170,7 +201,7 @@ Brain.prototype.mooreNeighborhood = function(x, y) {
 	    this.cellAt(x - 1, y + 1),
 	    this.cellAt(x   ,  y + 1),
 	    this.cellAt(x + 1, y + 1)];
-}
+};
 
 Brain.prototype.render = function(context) {
     context.save();
@@ -194,12 +225,11 @@ Brain.prototype.render = function(context) {
 	}
     }
     context.restore();
-}    
+};   
 
 Brain.prototype.step = function(context) {
-    this.render(context);
     this.update();
     this.swap();
-}
+};
 
 document.addEventListener("DOMContentLoaded", Simulation.begin, true);

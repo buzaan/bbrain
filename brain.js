@@ -1,4 +1,5 @@
-/* jslint browser: true */
+/*jslint browser: true */
+/*global window:true  */
 
 function Brain(x_cells, y_cells) {
     this.canvas = document.getElementById('brain');

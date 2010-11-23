@@ -5,31 +5,30 @@
     <title>Brian's Brain</title>
     <script src="brain.js" type="text/javascript"/>
     <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="favicon.ico"/>
   </head>
 
   <body>
-    <article>
-      <section>
-	<h1>Bryan's Brain</h1>
-	<p>What the heck is <a href="http://www.wikipedia.org/wiki/Brian's_Brain">Brian's Brain</a>?</p>
-
-	<p>Creating simple programs using JavaScript and the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html">canvas</a> element is all the rage these days, so I thought I'd join in. This page is also XHTML served as application/xhtml+xml for extra points.</p>
-      </section>
-
-      <section>
-	<button id="pause" type="button">Start/Stop</button>
-	
-	<div class="controls">
-	  <p>X: <input id="xdim" type="number"/></p>
-	  <p>Y: <input id="ydim" type="number"/></p>
-	  <p>Rate: <input id="interval" type="number"/>ms.</p>
-	  <button id="restart">Restart</button>
-	</div>
-      </section>
+    <div>
+      <h1>Bryan's Brain</h1>
+      <p>What the heck is <a href="http://www.wikipedia.org/wiki/Brian's_Brain">Brian's Brain</a>?</p>
       
-      <section class="content">
-	<canvas id="brain" width="500" height="500"/>
-      </section>
-    </article>
+      <p>Creating simple programs using JavaScript and the <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html">canvas</a> element is all the rage these days, so I thought I'd join in. This page is also XHTML served as application/xhtml+xml for extra points.</p>
+    </div>
+    
+    <div>
+      <button id="pause" type="button">Start/Stop</button>
+      
+      <div class="controls">
+	<p>X: <input id="xdim" type="number"/></p>
+	<p>Y: <input id="ydim" type="number"/></p>
+	<p>Rate: <input id="interval" type="number"/>ms.</p>
+	<button id="restart">Restart</button>
+      </div>
+    </div>
+    
+    <div class="content">
+      <canvas id="brain" width="500" height="500"/>
+    </div>
   </body>
 </html>
